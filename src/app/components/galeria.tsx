@@ -1,23 +1,15 @@
-import { apiTindo } from "@/services/apiTindo";
+import { useData } from "@/contexts/useDataContext";
 import { Button } from "@nextui-org/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 export function Galeria() {
 
-    const [galeria, setGaleria] = useState<any[]>([])
-
-    useEffect(() => {
-        apiTindo.get("/galeria").then((response) => {
-            setGaleria(response.data);
-        });
-
-    }, []);
+    const { galeria } = useData();
 
     return (
         <section className="flex flex-wrap w-full justify-center px-4 md:px-12 gap-4">
-            {galeria.map((item) => (
+            {galeria.map((item: any) => (
                 <section key={item.id} className="w-full sm:w-[450px] border border-gray-200 rounded-lg">
                     <div className="relative flex w-full justify-center h-[250px]">
                         {item.alerta && <span className="absolute w-[90%] text-center bottom-4 bg-yellow-700 py-1 rounded-md">
@@ -46,7 +38,7 @@ export function Galeria() {
                                 <h4 className="text-2xl font-bold">{item.valorFinal}</h4>
                             </div>
 
-                            <Link href={`/visualizar/${item.id}`}>
+                            <Link href={`/visualizar/${item.tipo.toLowerCase()}/${item.id}`}>
                                 <Button radius="sm" className="font-semibold uppercase" color="primary">
                                     {item.botaoGaleria}
                                 </Button>

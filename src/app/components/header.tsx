@@ -1,25 +1,18 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { apiTindo } from "@/services/apiTindo";
 import { MenuItemsProps } from "@/types/header.types";
 import { Button, Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenu, NavbarMenuItem, NavbarMenuToggle } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaCartShopping } from "react-icons/fa6";
+import { useData } from "@/contexts/useDataContext";
 
 export function Header() {
 
-    const [logoCabecalho, setLogoCabecalho] = useState<string>("");
-    const [menuItems, setMenuItems] = useState<MenuItemsProps[]>([]);
+    const { config } = useData()
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    useEffect(() => {
-        apiTindo.get("/configuracao").then((response) => {
-            setLogoCabecalho(response.data.logoCabecalho);
-            setMenuItems(response.data.menu);
-        })
-
-    }, []);
+    const menuItems: MenuItemsProps[] = config?.menu || []
 
     return (
         <Navbar
@@ -29,8 +22,8 @@ export function Header() {
             onMenuOpenChange={setIsMenuOpen}
             disableScrollHandler
             classNames={{
-                wrapper: "flex sm:flex-col py-14 gap-8 mb-14 text-white bg-corHeader h-[150px] sm:h-auto",
-                menu: "z-50 mt-20 items-center gap-4",
+                wrapper: "flex sm:flex-col py-10 gap-8 mb-8 text-white bg-corHeader h-[150px] sm:h-auto",
+                menu: "z-50 mt-20 flex items-center gap-4",
                 menuItem: "hover:text-white hover:bg-corTema hover:cursor-pointer px-4 py-2 rounded-md first-letter:uppercase transition-colors",
             }}
             style={{ height: "auto" }}
@@ -43,10 +36,10 @@ export function Header() {
 
             <NavbarContent justify="center">
                 <NavbarBrand>
-                    {logoCabecalho && (
+                    {config?.logoCabecalho && (
                         <Link href="/">
                             <Image
-                                src={logoCabecalho}
+                                src={config?.logoCabecalho}
                                 className="w-full max-w-[180px] h-auto"
                                 width={150} height={50}
                                 priority

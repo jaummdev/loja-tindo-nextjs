@@ -1,3 +1,6 @@
+import { Footer } from "./components/footer";
+import { Header } from "./components/header";
+import { FloatButton } from "./components/layout/floatButton";
 import "./globals.css";
 import { Providers } from "./providers";
 import { apiTindo } from "@/services/apiTindo";
@@ -32,7 +35,9 @@ export default function RootLayout({
         className="antialiased"
       >
         <Providers>
+          <Header />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>
