@@ -39,7 +39,11 @@ export default function Home() {
       <Container>
         {/* Seção do Slider */}
         <section className="w-full flex justify-center px-6">
-          <Carousel className="w-full max-w-[1000px] rounded-lg">
+          <Carousel className="w-full max-w-[1000px] rounded-lg"
+            placeholder="Slider Images"
+            onPointerEnterCapture={() => { }}
+            onPointerLeaveCapture={() => { }}
+          >
             {sliderImages.map((image, index) => (
               <div key={index} className="flex justify-center items-center">
                 <Image

@@ -96,7 +96,7 @@ export default function VisualizarDinamico() {
             return;
         }
 
-        const formattedDate = dataPasseio ? format(new Date(dataPasseio), "dd/MM/yyyy") : "";
+        const formattedDate = dataPasseio ? format(new Date(dataPasseio.toString()), "dd/MM/yyyy") : "";
 
         addToCart({
             id: dynamicData?.id || "produto-sem-id",
@@ -122,7 +122,12 @@ export default function VisualizarDinamico() {
         <Container className="flex justify-center px-8">
             <section className="flex flex-col md:flex-row justify-center gap-4 bg-gray-200 px-6 py-4 rounded-md">
                 <section className="flex flex-col gap-4 max-w-[700px]">
-                    <Carousel autoplay={true} loop={true} className="w-full max-w-[800px] max-h-[400px] rounded-lg">
+                    <Carousel placeholder="Slider Images"
+                        onPointerEnterCapture={() => {}}
+                        onPointerLeaveCapture={() => {}}
+                        autoplay={true} loop={true}
+                        className="w-full max-w-[800px] max-h-[400px] rounded-lg"
+                    >
                         {sliderImages.map((image, index) => {
                             if (invalidImages.has(index)) return null;
 
