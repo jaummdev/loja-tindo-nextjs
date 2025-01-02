@@ -1,8 +1,8 @@
 "use client";
-import { useData } from "@/contexts/useDataContext";
 import Image from "next/image";
 import Link from "next/link";
 import { JSX } from "react";
+import { useData } from "@/contexts/useDataContext";
 import { FaFacebook, FaInstagram, FaPhone, FaTwitter, FaWhatsapp, FaYoutube } from "react-icons/fa6";
 
 export function Footer() {

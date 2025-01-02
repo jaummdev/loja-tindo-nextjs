@@ -1,5 +1,5 @@
-import { floatButtonProps } from "@/types/floatButton.types";
 import Link from "next/link";
+import { floatButtonProps } from "@/types/floatButton.types";
 import { FaInstagram, FaTelegram, FaWhatsapp } from "react-icons/fa6";
 
 export function FloatButton({ redeSocial, link }: floatButtonProps) {

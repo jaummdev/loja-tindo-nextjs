@@ -1,45 +1,71 @@
 "use client";
+
 import Image from "next/image";
 import { Container } from "@/app/components/layout/container";
 import { useData } from "@/contexts/useDataContext";
-import { Button, DatePicker, Divider, Input, Select, SelectItem } from "@nextui-org/react";
+import { Button, DatePicker, DateValue, Divider, Input, Select, SelectItem } from "@nextui-org/react";
 import { useState } from "react";
 import { FaClock, FaLocationDot, FaRegClock, FaRegLightbulb, FaUsers } from "react-icons/fa6";
 import { VLabel, VSection, VSpan } from "@/app/components/layout/visualizar";
 import { TiWarningOutline } from "react-icons/ti";
-import Link from "next/link";
 import { Carousel } from "@material-tailwind/react";
+import { QuantidadeProps } from "@/types/visualizar.types";
+import { useCart } from "@/contexts/useCartContext";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
 
 export default function VisualizarDinamico() {
+    const router = useRouter();
     const { dynamicData, loading, error } = useData();
-    const [quantidades, setQuantidades] = useState({
+    const { addToCart } = useCart();
+    const [invalidImages, setInvalidImages] = useState<Set<number>>(new Set());
+    const [dataPasseio, setDataPasseio] = useState<DateValue | null>(null);
+    const [localEmbarque, setLocalEmbarque] = useState<string>("");
+    const [horarioEmbarque, setHorarioEmbarque] = useState<string>("");
+    const [quantidades, setQuantidades] = useState<QuantidadeProps>({
         adulto: 0,
         crianca: 0,
         bebe: 0,
         idoso: 0,
     });
 
-    const horarios = [
-        { label: "08:00", value: "08:00" },
-        { label: "09:00", value: "09:00" },
-        { label: "10:00", value: "10:00" },
-    ]
+    const horarios: { label: string; key: string; }[] = [
+        { label: "08:00", key: "08:00" },
+        { label: "09:00", key: "09:00" },
+        { label: "10:00", key: "10:00" },
+    ];
 
-    const tipos = [
+    const tipos: { label: string; value: number; type: keyof QuantidadeProps }[] = [
         { label: "Adulto", value: quantidades.adulto, type: "adulto" },
         { label: "Criança", value: quantidades.crianca, type: "crianca" },
         { label: "Bebê", value: quantidades.bebe, type: "bebe" },
         { label: "Idoso", value: quantidades.idoso, type: "idoso" },
     ];
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const handleImageError = (index: number) => {
+        setInvalidImages((prev) => new Set(prev).add(index));
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, type: keyof QuantidadeProps) => {
         setQuantidades({
             ...quantidades,
             [type]: parseInt(e.target.value) || 0,
         });
     };
 
-    if (loading){
+    const handleDateChange = (value: DateValue | null) => {
+        setDataPasseio(value);
+    };
+
+    const handleChangeHorarios = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setHorarioEmbarque(e.target.value);
+    };
+
+    const handleChangeLocais = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setLocalEmbarque(e.target.value);
+    };
+
+    if (loading) {
         return (
             <Container className="flex justify-center">
                 Carregando...
@@ -47,7 +73,7 @@ export default function VisualizarDinamico() {
         );
     }
 
-    if (error){
+    if (error) {
         return (
             <Container className="flex justify-center">
                 Erro: {error}
@@ -62,29 +88,64 @@ export default function VisualizarDinamico() {
             .filter((image) => image && typeof image === "string" && image.trim() !== "")
         : [];
 
+    const handleAddToCart = () => {
+        const totalPessoas =
+            quantidades.adulto + quantidades.crianca + quantidades.bebe + quantidades.idoso;
+        if (totalPessoas === 0) {
+            alert("Adicione pelo menos uma pessoa ao carrinho.");
+            return;
+        }
+
+        const formattedDate = dataPasseio ? format(new Date(dataPasseio), "dd/MM/yyyy") : "";
+
+        addToCart({
+            id: dynamicData?.id || "produto-sem-id",
+            titulo: dynamicData?.nome || "",
+            pessoas: {
+                adulto: quantidades.adulto,
+                crianca: quantidades.crianca,
+                bebe: quantidades.bebe,
+                idoso: quantidades.idoso,
+            },
+            dataPasseio: formattedDate,
+            horarioEmbarque: horarioEmbarque,
+            localEmbarque: localEmbarque,
+            imagemCapa: dynamicData?.imagemCapa || "",
+            valor: dynamicData?.valorDestaque || 0,
+        });
+
+        // Navega para a página do carrinho
+        router.push("/carrinho");
+    };
+
     return (
         <Container className="flex justify-center px-8">
             <section className="flex flex-col md:flex-row justify-center gap-4 bg-gray-200 px-6 py-4 rounded-md">
                 <section className="flex flex-col gap-4 max-w-[700px]">
-                    <Carousel className="w-full max-w-[800px] max-h-[400px] rounded-lg">
-                        {sliderImages.map((image, index) => (
-                            <Image
-                                src={image}
-                                key={index}
-                                className="w-full h-full object-cover rounded-lg"
-                                alt={`slider-${index}`}
-                                width={800}
-                                height={400}
-                                quality={100}
-                                onError={(e) => {
-                                    console.error("Invalid URL:", image);
-                                    e.currentTarget.style.display = "none";
-                                }}
-                            />
-                        ))}
+                    <Carousel autoplay={true} loop={true} className="w-full max-w-[800px] max-h-[400px] rounded-lg">
+                        {sliderImages.map((image, index) => {
+                            if (invalidImages.has(index)) return null;
+
+                            return (
+                                <Image
+                                    src={image}
+                                    key={index}
+                                    className="w-full h-full object-cover rounded-lg"
+                                    alt={`slider-${index}`}
+                                    width={800}
+                                    height={400}
+                                    quality={100}
+                                    onError={() => handleImageError(index)}
+                                />
+                            );
+                        })}
                     </Carousel>
 
-                    <div dangerouslySetInnerHTML={{ __html: dynamicData?.descricaoSite }}></div>
+                    {dynamicData?.descricaoSite ? (
+                        <div dangerouslySetInnerHTML={{ __html: dynamicData?.descricaoSite }}></div>
+                    ) : (
+                        <div className="text-center text-red-700">Descrição não disponível...</div>
+                    )}
                 </section>
 
                 <section className="flex flex-col gap-2">
@@ -98,15 +159,19 @@ export default function VisualizarDinamico() {
                     </VSection>
 
                     <VSection>
-                        {dynamicData?.duracaoServico && <VSpan>
-                            <FaRegClock size={15} />
-                            {dynamicData?.duracaoServico}
-                        </VSpan>}
+                        {dynamicData?.duracaoServico && (
+                            <VSpan>
+                                <FaRegClock size={15} />
+                                {dynamicData?.duracaoServico}
+                            </VSpan>
+                        )}
 
-                        {dynamicData?.alerta && <VSpan>
-                            <FaRegLightbulb size={15} />
-                            {dynamicData?.alerta}
-                        </VSpan>}
+                        {dynamicData?.alerta && (
+                            <VSpan>
+                                <FaRegLightbulb size={15} />
+                                {dynamicData?.alerta}
+                            </VSpan>
+                        )}
                     </VSection>
 
                     {dynamicData?.hasDisponibilidade ? (
@@ -122,7 +187,7 @@ export default function VisualizarDinamico() {
                                             key={type}
                                             type="number"
                                             label={label}
-                                            value={quantidades[type] || 0}
+                                            value={value.toString()}
                                             className="max-w-[100px]"
                                             radius="sm"
                                             onChange={(e) => handleInputChange(e, type)}
@@ -136,6 +201,8 @@ export default function VisualizarDinamico() {
                                 <DatePicker
                                     label="Escolha a data"
                                     radius="sm"
+                                    value={dataPasseio}
+                                    onChange={handleDateChange}
                                 />
                             </div>
 
@@ -146,10 +213,15 @@ export default function VisualizarDinamico() {
                                         Escolha um horário
                                     </VLabel>
 
-                                    <Select label="Selecione um horário" radius="sm">
-                                        {horarios.map((item: any, index: any) => (
-                                            <SelectItem key={index} value={item.value}>
-                                                {item.label}
+                                    <Select
+                                        label="Selecione um horário"
+                                        selectedKeys={[horarioEmbarque]}
+                                        onChange={handleChangeHorarios}
+                                        radius="sm"
+                                    >
+                                        {horarios.map((horario) => (
+                                            <SelectItem key={horario.key}>
+                                                {horario.label}
                                             </SelectItem>
                                         ))}
                                     </Select>
@@ -161,12 +233,25 @@ export default function VisualizarDinamico() {
                                         Escolha um local
                                     </VLabel>
 
-                                    <Select label="Selecione um local" radius="sm">
-                                        {dynamicData?.locaisEmbarque.map((item: any) => (
-                                            <SelectItem key={item.id} value={item.nome}>
-                                                {item.nome}
-                                            </SelectItem>
-                                        ))}
+                                    <Select
+                                        label="Selecione um local"
+                                        selectedKeys={[localEmbarque]}
+                                        onChange={handleChangeLocais}
+                                        radius="sm"
+                                    >
+                                        {dynamicData?.locaisEmbarque ? (
+                                            dynamicData?.locaisEmbarque.map((local: any) => (
+                                                <SelectItem key={local.nome}>
+                                                    {local.nome}
+                                                </SelectItem>
+                                            ))
+                                        ) : (
+                                            dynamicData?.localPadraoEmbarque && (
+                                                <SelectItem key={dynamicData?.localPadraoEmbarque}>
+                                                    {dynamicData?.localPadraoEmbarque}
+                                                </SelectItem>
+                                            )
+                                        )}
                                     </Select>
                                 </div>
                             </div>
@@ -175,20 +260,22 @@ export default function VisualizarDinamico() {
 
                             <section className="flex w-full my-6 justify-between">
                                 <span>TOTAL:</span>
-                                <h2 className="font-semibold text-2xl text-corTema">{dynamicData?.valorDestaque}</h2>
+                                <h2 className="font-semibold text-2xl text-corTema">
+                                    {dynamicData?.valorDestaque}
+                                </h2>
                             </section>
 
                             <Divider />
 
-                            <Link href="/carrinho">
-                                <Button color="secondary"
-                                    radius="sm"
-                                    className="uppercase font-semibold my-4"
-                                    fullWidth>
-                                    Adicionar ao carrinho
-                                </Button>
-                            </Link>
-
+                            <Button
+                                color="secondary"
+                                onPress={handleAddToCart}
+                                radius="sm"
+                                className="uppercase font-semibold my-4"
+                                fullWidth
+                            >
+                                Adicionar ao carrinho
+                            </Button>
                         </VSection>
                     ) : (
                         <VSection>
@@ -205,4 +292,3 @@ export default function VisualizarDinamico() {
         </Container>
     );
 }
-

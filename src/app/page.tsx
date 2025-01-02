@@ -11,7 +11,7 @@ export default function Home() {
   const { config, loading, error } = useData();
 
   if (loading) return (
-    <Container className="flex justify-center">
+    <Container>
       Carregando...
     </Container>
   );
@@ -64,7 +64,7 @@ export default function Home() {
         </section>
 
         {/* Seção dos Selos */}
-        <section className="w-full my-16">
+        <section className="w-full">
           <div className="flex flex-row flex-wrap w-full justify-center gap-8 sm:gap-12">
             {footerCardsImages.map((item, index) => (
               <Image
