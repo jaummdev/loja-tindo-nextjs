@@ -15,7 +15,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             horarioEmbarque: item.horarioEmbarque || "",
         };
 
-        const cleanValue = sanitizedItem.valor ? parseFloat(sanitizedItem.valor.replace(/[^\d,.-]/g, '').replace(",", ".")) : 0;
+        const cleanValue = sanitizedItem.valor
+            ? parseFloat(
+                String(sanitizedItem.valor)
+                    .replace(/[^\d,.-]/g, '')
+                    .replace(",", ".")
+            )
+            : 0;
 
         const newItem = {
             ...sanitizedItem,
@@ -23,35 +29,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         };
 
         setCart((prev) => [...prev, newItem]);
-        localStorage.setItem('cart', JSON.stringify([...cart, newItem]));
+        localStorage.setItem("cart", JSON.stringify([...cart, newItem]));
     };
 
-
     const removeFromCart = (id: string) => {
-        setCart((prev) => prev.filter((item) => item.id !== id));
-        localStorage.setItem('cart', JSON.stringify(cart.filter((item) => item.id !== id)));
+        const updatedCart = cart.filter((item) => item.id !== id);
+        setCart(updatedCart);
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     const clearCart = () => {
         setCart([]);
-        localStorage.removeItem('cart');
+        localStorage.removeItem("cart");
     };
 
     useEffect(() => {
         const loadCartFromLocalStorage = () => {
-            const storedCart = localStorage.getItem('cart');
+            const storedCart = localStorage.getItem("cart");
             if (storedCart) {
                 const parsedCart = JSON.parse(storedCart);
 
-                const cleanedCart = parsedCart.map((item: CartItem) => {
-                    // Verificar se item.valor é uma string antes de aplicar o replace
-                    const valor = typeof item.valor === 'string'
-                        ? item.valor.replace(/[^\d,.-]/g, '').replace(",", ".")
-                        : item.valor;
+                const cleanedCart = parsedCart.map((item: CartItem | any) => {
+                    const valor = typeof item?.valor === "string"
+                        ? parseFloat(item?.valor.replace(/[^\d,.-]/g, '').replace(",", "."))
+                        : item?.valor;
 
                     return {
                         ...item,
-                        valor: valor ? parseFloat(valor) : 0,
+                        valor: valor || 0,
                     };
                 });
 
@@ -76,5 +81,3 @@ export function useCart() {
     }
     return context;
 }
-
-
