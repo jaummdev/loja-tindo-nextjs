@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Projeto E-commerce Loja Tindo - Next JS
 
-## Getting Started
+Este projeto é uma aplicação web de e-commerce que integra uma API para gerenciamento dinâmico de configurações, galerias e itens. Ele foi desenvolvido com Next JS (com TypeScript), Next UI e Tailwind CSS, utilizando boas práticas de programação.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Estrutura do Projeto
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Arquivos Principais**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **`/app/page.tsx`**
+  - Arquivo principal que gerencia a exibição dinâmica de páginas com base nas pastas '/app/carrinho' = /carrinho.
+  - Inclui componentes como cabeçalho, rodapé e botão flutuante dinâmico.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-  **`/services/apiTindo.ts`**
+  - Gerencia chamadas à API externa.
+  - Realiza requisições para carregar dados de configuração e galeria, utilizando Axios.
 
-## Learn More
+- **`/app/visualizar/[tipo]/[id]/page.tsx`**
+  - Detalhamento de um item específico da galeria.
+  - Permite ao usuário selecionar quantidade, data, horário e local de embarque.
+  - Exibe informações detalhadas sobre o item.
 
-To learn more about Next.js, take a look at the following resources:
+- **`/app/carrinho/page.tsx`**
+  - Gerencia itens adicionados ao carrinho.
+  - Exibe um resumo com a quantidade total e preço final.
+  - Permite limpar o carrinho ou finalizar a compra.
+  - Utilizando Localstorage do navegador como armazenamento de informações do item.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tecnologias Utilizadas
 
-## Deploy on Vercel
+### **Frontend**
+- **Next JS**
+- **Next UI**
+- **Tailwind CSS**
+- **Material Tailwind**
+- **React Icons/Fa6 (Font Awesome)**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### **APIs**
+- **API Tindo**: Fornece dados de configuração e galeria.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Funcionalidades
+
+1. **Carrossel Dinâmico**:
+   - Exibe imagens configuradas na API.
+   - Suporte a navegação por botões e indicadores.
+
+2. **Galeria de Produtos**:
+   - Lista itens com imagens, títulos, preços e botões de ação.
+   - Utiliza cores e temas definidos na configuração.
+
+3. **Página de Detalhes**:
+   - Apresenta informações detalhadas de cada item.
+   - Permite configuração de compra personalizada (quantidade, data, local).
+
+4. **Carrinho de Compras**:
+   - Adiciona e gerencia itens.
+   - Mostra resumo com cálculo de total.
+
+5. **Responsividade**:
+   - Layout otimizado para dispositivos móveis e desktop.
+
+---
+
+Feito com ❤️ por [Jaumm Dev.](https://www.jaummdev.com.br)
