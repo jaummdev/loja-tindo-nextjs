@@ -38,8 +38,8 @@ export function Galeria() {
                                 <h4 className="text-2xl font-bold">{item.valorFinal}</h4>
                             </div>
 
-                            <Link href={`/visualizar/${item.tipo.toLowerCase()}/${item.id}`}>
-                                <Button radius="sm" className="font-semibold uppercase" color="primary">
+                            <Link href={`/visualizar/${item.tipo.toLowerCase()}/${item.id}`} legacyBehavior passHref>
+                                <Button as="a" radius="sm" className="font-semibold uppercase" color="primary">
                                     {item.botaoGaleria}
                                 </Button>
                             </Link>

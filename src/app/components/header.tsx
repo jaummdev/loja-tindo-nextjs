@@ -18,12 +18,10 @@ export function Header() {
 
     const CarrinhoButton = () => {
         return (
-            <Link href="/carrinho">
-                <Badge content={cart.length} className="border-none" color="danger" size="md">
-                    <Button color="primary" isIconOnly radius="sm">
-                        <FaCartShopping size={22} />
-                    </Button>
-                </Badge>
+            <Link href="/carrinho" legacyBehavior passHref>
+                <Button as="a" color="primary" isIconOnly radius="sm">
+                    <FaCartShopping size={22} />
+                </Button>
             </Link>
         )
     }
@@ -74,7 +72,9 @@ export function Header() {
                     </NavbarItem>
                 ))}
                 <div>
-                    <CarrinhoButton />
+                    <Badge content={cart.length} className="border-none" color="danger" size="md">
+                        <CarrinhoButton />
+                    </Badge>
                 </div>
             </NavbarContent>
 
@@ -83,14 +83,16 @@ export function Header() {
             <NavbarMenu>
                 {menuItems.map((item) => (
                     <NavbarMenuItem key={item.id} className="hover:bg-corTema">
-                        <Link href={item.tipo == "LINK" ? item.url : "#"}>
+                        <Link href={item.tipo == "LINK" ? item.url : "#"} legacyBehavior passHref>
                             {item.nome}
                         </Link>
                     </NavbarMenuItem>
                 ))}
 
                 <NavbarMenuItem className="p-4">
-                    <CarrinhoButton />
+                    <Badge content={cart.length} className="border-none" color="danger" size="md">
+                        <CarrinhoButton />
+                    </Badge>
                 </NavbarMenuItem>
             </NavbarMenu>
         </Navbar>
